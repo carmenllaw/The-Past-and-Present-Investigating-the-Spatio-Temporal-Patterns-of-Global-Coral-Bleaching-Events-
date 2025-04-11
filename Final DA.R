@@ -1,11 +1,11 @@
 rm(list=ls())
 library(ggplot2)
+library(glmmTMB)
 
 #rc<-read.csv("final_combined_severity.csv")
 #test removing ecoregions and sensitivity check done for previous dataset without coral watch (old):----
-library(glmmTMB)
 
-# 1. Compute survey counts per ecoregion
+#survey counts per ecoregion
 ecoregion_counts <- rc_cleaned %>%
   group_by(Region) %>%
   summarise(total_surveys = n()) %>%
