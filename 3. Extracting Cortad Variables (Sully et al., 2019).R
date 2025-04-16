@@ -4,9 +4,9 @@
 rm(list=ls())
 
 #open packages: 
-library("ncdf4")
-library("raster")
-library("dplyr")
+library(ncdf4)
+library(raster)
+library(dplyr)
 library(ggplot2)
 library(string)
 
@@ -515,6 +515,7 @@ sum(is.na(TSA_DHW_Standard_Deviation))
 sum(is.na(TSA_DHW_Max))
 sum(is.na(TSA_DHW_Mean))
 
+#remove 2023-2024 in rc dataset
 bleaching_with_cortad_variables <- bleaching_with_cortad_variables %>%
   mutate(Date2 = as.Date(Date, format = "%d-%b-%y")) %>%
   filter(!(format(Date2, "%Y") %in% c("2023", "2024")))
@@ -998,11 +999,6 @@ bleaching_with_cortad_variables <- cbind(cw,
                                          TSA = TSA_data, TSA_Standard_Deviation, TSA_Mean, TSA_Minimum, TSA_Maximum, 
                                          TSA_Freq, TSA_Freq_Standard_Deviation, TSA_Freq_Mean, TSA_Freq_Max, TSA_DHW, 
                                          TSA_DHW_Standard_Deviation, TSA_DHW_Max, TSA_DHW_Mean)
-
-# Remove surveys from years 2023 and 2024
-bleaching_with_cortad_variables <- bleaching_with_cortad_variables %>%
-  mutate(Date2 = as.Date(Date, format = "%d-%b-%y")) %>%
-  filter(!(format(Date2, "%Y") %in% c("2023", "2024")))
 
 write.csv(bleaching_with_cortad_variables, "cw_cortad_2022.csv", row.names = FALSE)
 
