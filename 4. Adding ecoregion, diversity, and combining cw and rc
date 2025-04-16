@@ -234,55 +234,6 @@ combined <- combined %>%
 combined<- combined %>% relocate(Bleached, Severity, .after = Average_bleaching)
 write.csv(combined, "final_combined_severity.csv", row.names=FALSE )
 
-
-#exploratory data analysis:----
-library(ggplot2)
-rc<-read.csv("final_combined_severity.csv")
-
-rc$ClimSST <- rc$ClimSST - 273.15
-rc$Temperature_Kelvin <- rc$Temperature_Kelvin - 273.15
-rc$Temperature_Mean <- rc$Temperature_Mean - 273.15
-rc$Temperature_Maximum <- rc$Temperature_Maximum - 273.15
-rc$Temperature_Minimum <- rc$Temperature_Minimum - 273.15
-
-#history of average bleaching
-ggplot(rc, aes(x = Average_bleaching)) +
-  geom_histogram(bins = 30, fill = "skyblue", color = "black") +
-  theme_minimal() +
-  labs(title = "Histogram of Average Bleaching",
-       x = "Average Bleaching", y = "Count")
-
-ggplot(rc, aes(x = Temperature_Mean, y = Average_bleaching)) +
-  geom_point(alpha = 0.6) +
-  geom_smooth(method = "lm", se = TRUE, color = "blue") +
-  theme_minimal() +
-  labs(title = "Average Bleaching vs Temperature Mean",
-       x = "Temperature Mean", y = "Average Bleaching")
-
-#pearson correlation test:
-library(corrplot)
-variables <- c("Latitude.Degrees","Year","Depth","Temperature_Kelvin","Temperature_Kelvin_Standard_Deviation",
-                "Temperature_Maximum","SSTA","SSTA_Maximum","SSTA_Minimum",
-                "SSTA_Frequency","SSTA_Frequency_Standard_Deviation","SSTA_DHW","TSA_Frequency",
-                "TSA_Frequency_Standard_Deviation","TSA_DHW_Standard_Deviation","ClimSST",
-                "rate_of_SST_change")
-sub_data <- rc[, variables]
-#spearman correlation matrix, ignoring rows with missing values
-cor_matrix <- cor(sub_data, method = "pearson", use = "complete.obs")
-plot.new()
-dev.off()
-quartz(width = 10, height = 10)  # or quartz(), x11() depending on your OS
-corrplot(cor_matrix,
-         method = "color",            
-         type = "full",              
-         tl.col = "black",            
-         tl.cex = 0.7,
-         tl.srt = 45,
-         addCoef.col = "black",       
-         number.cex = 0.7, 
-         mar = c(0.45, 0.45, 0.45, 0.45))
-
-
 #cw ecoregions and diversity:---- 
 cw<-read.csv("cw_cortad_2022.csv")
 diversity<-read.csv("Coral_diversity.csv")
@@ -308,6 +259,7 @@ cw_joined <- st_join(cw_eco, ECO_noholes[, c("ERG", "Ecoregion")])
 #ECO_noholes_valid <- st_make_valid(ECO_noholes)
 #rc_joined <- st_join(rc_eco, ECO_noholes_valid[, c("ECO_CODE", "ECOREGION")])
 
+#extracting div and eco part 2
 cw_joined <- cw_joined %>%
   rename(Ecoregion_code = ERG) 
 
@@ -534,20 +486,6 @@ cw_cleaned <- cw_cleaned %>%
     Country %in% c("Thailand", "Cambodia", "Malaysia", "Philippines", "Vietnam", "Indonesia", "Brunei", "Timor-Leste") ~ "Indo-Pacific"
   ))
 
-rc<-read.csv("final_combined_severity.csv")
-rc <- rc %>%
-  mutate(Ocean = if_else(Country %in% c("Thailand", "Cambodia", "Malaysia", "Philippines", "Vietnam", "Indonesia", "Brunei", "Myanmar"),
-                         "Indo-Pacific",
-                         Ocean))
-rc <- rc %>%
-  mutate(Ocean = if_else(Country %in% c("Taiwan","Taiwan, Province of China"),
-                         "Pacific",
-                         Ocean))
-
-rc_unique_locations<- rc %>%
-  distinct(Country, Ocean, State.Province.Island)
-
-table(rc$Ocean)
 
 #name source for each dataset 
 rc <- rc %>%
